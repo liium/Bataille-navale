@@ -19,6 +19,10 @@
 #define PORTEAVION_TAILLE 6
 #define PORTEAVION_ID 4
 
+
+//modif github
+
+
 void Color(int couleurDuTexte,int couleurDeFond){
         HANDLE H=GetStdHandle(STD_OUTPUT_HANDLE);
         SetConsoleTextAttribute(H,couleurDeFond*16+couleurDuTexte);
