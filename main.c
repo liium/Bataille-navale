@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <windows.h>
 
+
 #define MAXHAUT 18
 #define MAXLARG 24
 #define JOUEUR1 0
@@ -19,8 +20,6 @@
 #define PORTEAVION_TAILLE 6
 #define PORTEAVION_ID 4
 
-
-//modif github
 
 
 void Color(int couleurDuTexte,int couleurDeFond){
@@ -56,6 +55,7 @@ int doRand(int startVal, int endVal){
         return (rand() % ((endVal + startVal -1)) + startVal);}
 }
 
+
 void bateau(int map[MAXHAUT][MAXLARG][2], int joueur, int tailleBateau, int idBateau, int x, int y, int vieBateau){
    int i;
 
@@ -67,11 +67,15 @@ void bateau(int map[MAXHAUT][MAXLARG][2], int joueur, int tailleBateau, int idBa
     }vieBateau == tailleBateau;
 }
 
+
 void PlacerRand(int map[MAXHAUT][MAXLARG][2], int joueur, int tailleBateau, int idBateau, int x, int y){
    int vieBateau;
+   int i;
+
     x = doRand(0,MAXHAUT-1);
     y = doRand(0,MAXLARG-1);
     bateau(map, joueur, tailleBateau, idBateau, x, y, vieBateau);
+
 }
 
 void PlacerBateauIA(int map[MAXHAUT][MAXLARG][2], int joueur){
@@ -79,13 +83,14 @@ void PlacerBateauIA(int map[MAXHAUT][MAXLARG][2], int joueur){
     int x;
     int y;
 
-   // while pour pas que ça dépasse et que ça se superpose
 
     for(i=0;i<NB_CORVETTE;i++){
         PlacerRand(map, joueur, CORVETTE_TAILLE, CORVETTE_ID, x, y);
     }
     for(i=0;i<NB_DESTROYER;i++){
+        //if (map[x][y][joueur]==0){
         PlacerRand(map,joueur,DESTROYER_TAILLE,DESTROYER_ID, x, y);
+        //}else{}
     }
     for(i=0;i<NB_CROISEUR;i++){
         PlacerRand(map,joueur,CROISEUR_TAILLE,CROISEUR_ID, x, y);
@@ -95,36 +100,59 @@ void PlacerBateauIA(int map[MAXHAUT][MAXLARG][2], int joueur){
     }
 }
 
+
 void attaqueIA1(int map[MAXHAUT][MAXLARG][2], int joueur){
     int x = 0;
     int y = 0;
     int vieBateau;
     int idBateau;
+    int tir = 9;
 
     x = doRand(0,MAXHAUT-1);
     y = doRand(0,MAXLARG-1);
 
     while(vieBateau !=0){
 
-        while(map[x][y][joueur]!=0 && map[x][y][joueur]!=9){
-        map[x][y][joueur]==9;
+        do{
+        tir = map[x][y][joueur];
+        printf("%d", map[x][y][joueur]);
             if(map[x][y][joueur]==9){
             Color(0,12);
             }
-        printf("%d", map[x][y][joueur]);
+
         if(map[x][y][joueur]==1 || map[x][y][joueur]==2 || map[x][y][joueur]==3 || map[x][y][joueur]==4){
         printf("\nTouche!\n");
         vieBateau=vieBateau-1;
         affichemap(map, joueur);
         }else{
-        printf("\nLoupé...\n");}
-        }
+        printf("\nLoupe...\n");}
+
         if (vieBateau==0){
-            printf("Vous avez coulé le bateau %d\n", &idBateau);
+            printf("Vous avez coule le bateau %d\n", &idBateau);
             affichemap(map, joueur);
+            }
+        } while (map[MAXHAUT][MAXLARG][joueur]!=0 && map[MAXHAUT][MAXLARG][joueur]!=9);
+    }
+}
+
+
+void attaqueIA2(int map[MAXHAUT][MAXLARG][2], int joueur){
+    int x = 0;
+    int y = 0;
+    int vieBateau;
+    int idBateau;
+    int tir = 9;
+
+    while(vieBateau !=0){
+     if(map[x][y][joueur]==1 || map[x][y][joueur]==2 || map[x][y][joueur]==3 || map[x][y][joueur]==4){
+            map[x][y][joueur]=tir;
+            printf("%d", map[x][y][joueur]);
+            if(map[x][y][joueur]==9){
+            Color(0,12);}
         }
     }
 }
+
 
 int main()
 {
@@ -135,147 +163,67 @@ int main()
     int jj=0;
     int x=0;
     int y=0;
+    int choixmenu;
 
-    printf("Bataille navale\n");
-    printf("IA contre IA\n");
-    printf("\nPlacement bateaux\n");
+    printf("\n  **************************\n\n");
+    printf("  *    Bataille navale     *\n\n");
+    printf("  **************************\n\n\n");
 
-    printf("\nBateaux joueur 1\n");
+    printf("__________________________________\n\n");
+    printf("  Pour IA contre IA: tapper 1\n\n  Pour joueur contre IA: tapper 2\n");
+    printf("__________________________________\n\n");
+    scanf("%d", &choixmenu);
+    if (choixmenu==1){
+
+    printf("  IA contre IA\n");
+    printf("\n    Placement bateaux\n");
+
+    printf("\n Bateaux joueur 1\n");
      PlacerBateauIA(map, JOUEUR1);
 
      affichemap(map, JOUEUR1);
      printf("\n");
 
-    printf("\nBateaux joueur 2\n");
+    printf("\n Bateaux joueur 2\n");
      PlacerBateauIA(map, JOUEUR2);
      affichemap(map, JOUEUR2);
      printf("\n");
 
-    //while(map[x][y][JOUEUR1]!=0 || map[x][y][JOUEUR2]!=0){
-    printf("\nA l'attaque!\n");
+    //while(map[x][y][JOUEUR1]!=0 && map[x][y][JOUEUR1]!=9 || map[x][y][JOUEUR2]!=0 && map[x][y][JOUEUR2]!=9){
+    printf("\n  A l'attaque!\n");
     attaqueIA1(map,JOUEUR1);
     affichemap(map, JOUEUR1);
     printf("\n");
-
-    attaqueIA1(map,JOUEUR2);
+//    }
+    attaqueIA2(map,JOUEUR2);
     affichemap(map, JOUEUR2);
     printf("\n");
-   // }
-    return 0;
-}
 
-/*
 
-    while(map[x][y][JOUEUR1]!=0 || map[x][y][JOUEUR2]!=0){
-    printf("\nA l'attaque!\n");
-    attaque(map,JOUEUR1);
-    affichemap(map, JOUEUR1);
-    attaque(map,JOUEUR2);
-    affichemap(map, JOUEUR2);
+   }else if(choixmenu==2){
+      printf("  Joueur contre IA\n");
+      printf("    Placement des bateaux: \n");
+    printf("\n Vous placez une corvette: placement vertical (Entre 0 et 24)\n");
+    scanf("%d\n", x);
+    if (x<0 && x>24){
+        printf("Non non, ce n'est pas entre 0 et 24\n");
     }
 
-    Joueur contre IA
-    printf("\nVous placez une corvette: placement vertical (Entre 0 et 24)\n");
-    scanf("%d\n", x);
-    printf("\nVous placez une corvette: placement horizontal (Entre 0 et 17)\n");
+    printf("\n Placement horizontal (Entre 0 et 17)\n");
     scanf("%d\n", y);
-    printf("\nVous placez un destroyer: de quelle valeur voulez faire partir votre bateau? (Entre 0 et 24)\n");
+    if (y<0 || y>17){
+        printf("Non non, ce n'est pas entre 0 et 17\n");
+    }
+    affichemap(map, JOUEUR1);
+
+    printf("\n Vous placez un destroyer: de quelle valeur voulez faire partir votre bateau? (Entre 0 et 24)\n");
     scanf("%d\n",x);
-    printf("\nVous placez un destroyer: \n");
+    printf("\n Vous placez un destroyer: \n");
     scanf("%d\n",x);
-    bateau(map, JOUEUR1, DESTROYER1, x, y);
-*/
+    //bateau(map, JOUEUR1, DESTROYER1, x, y);
+   }else{
+   printf("   Pas d'autre choix, desolee...\n");}
+
+    return 0;}
 
 
-/*
-void placementcorvette(int map[XM][YM][2], int joueur){
-    int x = 0;
-    int y = 0;
-
-    x = doRand(0,17);
-    y = doRand(0,23);
-
-        if(map[x][y][joueur] == 0){
-        map[x][y][joueur] = CORVETTE;
-        }
-
-}
-void placementdestroyer1(int map[XM][YM][2], int joueur){
-    int x = 0;
-    int y = 0;
-
-    x = doRand(0,17);
-    y = doRand(0,23);
-
-        if(map[x][y][joueur] == 0 && map[x+1][y][joueur]==0 && map[x+2][y][joueur]==0){
-        map[x][y][joueur]=DESTROYER1;
-        map[x+1][y][joueur]=DESTROYER1;
-        map[x+2][y][joueur]=DESTROYER1;
-        printf("%d", map[x][y][joueur]);}
-
-}
-
-
-
-void placementdestroyer2(int map[XM][YM][2], int joueur){
-    int x = 0;
-    int y = 0;
-
-    x = doRand(0,17);
-    y = doRand(0,23);
-
-        if(map[x][y][joueur] == 0 && map[x][y+1][joueur]==0 && map[x][y+2][joueur]==0){
-        map[x][y][joueur]=DESTROYER2;
-        map[x][y+1][joueur]=DESTROYER2;
-        map[x][y+2][joueur]=DESTROYER2;
-        printf("%d", map[x][y][joueur]);}
-
-}
-void placementcroiseur1(int map[XM][YM][2], int joueur){
-    int x = 0;
-    int y = 0;
-
-    x = doRand(0,17);
-    y = doRand(0,23);
-
-        if(map[x][y][joueur] == 0 && map[x+1][y][joueur]==0 && map[x+2][y][joueur]==0 && map[x+3][y][joueur]==0){
-        map[x][y][joueur]= CROISEUR1;
-        map[x+1][y][joueur]=CROISEUR1;
-        map[x+2][y][joueur]=CROISEUR1;
-        map[x+3][y][joueur]=CROISEUR1;
-        printf("%d", map[x][y][joueur]);}
-
-}
-void placementcroiseur2(int map[XM][YM][2], int joueur){
-    int x = 0;
-    int y = 0;
-
-    x = doRand(0,17);
-    y = doRand(0,23);
-
-        if(map[x][y][joueur] == 0 && map[x][y+1][joueur]==0 && map[x][y+2][joueur]==0 && map[x][y+3][joueur]==0){
-        map[x][y][joueur]= CROISEUR2;
-        map[x][y+1][joueur]=CROISEUR2;
-        map[x][y+2][joueur]=CROISEUR2;
-        map[x][y+3][joueur]=CROISEUR2;
-
-        printf("%d", map[x][y][joueur]);}
-
-}
-void placementporteavion(int map[XM][YM][2], int joueur){
-    int x = 0;
-    int y = 0;
-
-    x = doRand(0,17);
-    y = doRand(0,23);
-
-        if(map[x][y][joueur] == 0 && map[x+1][y][joueur]==0 && map[x+2][y][joueur]==0 && map[x+3][y][joueur]==0 && map[x+4][y][joueur]==0 && map[x+5][y][joueur]==0){
-        map[x][y][joueur]=PORTEAVION;
-        map[x+1][y][joueur]=PORTEAVION;
-        map[x+2][y][joueur]=PORTEAVION;
-        map[x+3][y][joueur]=PORTEAVION;
-        map[x+4][y][joueur]=PORTEAVION;
-        map[x+5][y][joueur]=PORTEAVION;
-        printf("%d", map[x][y][joueur]);}
-}
-*/
